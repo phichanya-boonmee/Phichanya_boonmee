@@ -8,4 +8,5 @@ C:\Users\phichanya_boonmee\source\repos\WindowsFormsApp2\WindowsFormsApp2\obj\De
 C:\Users\phichanya_boonmee\source\repos\WindowsFormsApp2\WindowsFormsApp2\obj\Debug\WindowsFormsApp2.csproj.CoreCompileInputs.cache
 C:\Users\phichanya_boonmee\source\repos\WindowsFormsApp2\WindowsFormsApp2\obj\Debug\WindowsFormsApp2.exe
 C:\Users\phichanya_boonmee\source\repos\WindowsFormsApp2\WindowsFormsApp2\obj\Debug\WindowsFormsApp2.pdb
+C:\Users\phichanya_boonmee\source\repos\WindowsFormsApp2\WindowsFormsApp2\obj\Debug\WindowsFormsApp2.Form3.resources
 C:\Users\phichanya_boonmee\source\repos\WindowsFormsApp2\WindowsFormsApp2\obj\Debug\WindowsFormsApp2.Form2.resources

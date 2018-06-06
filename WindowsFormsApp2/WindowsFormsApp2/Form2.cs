@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.IO;
 
 namespace WindowsFormsApp2
 {
@@ -16,19 +15,29 @@ namespace WindowsFormsApp2
         public Form2()
         {
             InitializeComponent();
+            INIT();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private Point firstPoint = new Point();
+        public void INIT()
         {
-            for(int i=0; i< 10;++i)
+            panel1.MouseDown += (ss, ee) =>
             {
-                Panel myPanel1 = new Panel();
-                myPanel1.Size = new Size(10, 10);
-                myPanel1.Location = new Point(i * 10, i * 10);
-                myPanel1.BackColor = Color.Blue;
+                if (ee.Button == System.Windows.Forms.MouseButtons.Left) { firstPoint = Control.MousePosition; }
 
-                this.panel1.Controls.Add(myPanel1);
-            }
+            };
+            panel1.MouseMove += (ss, ee) =>
+            {
+                if (ee.Button == System.Windows.Forms.MouseButtons.Left)
+                {
+                    Point temp = Control.MousePosition;
+                    Point res = new Point(firstPoint.X - temp.X, firstPoint.Y - temp.Y);
+
+                    panel1.Location = new Point(panel1.Location.X - res.X, panel1.Location.Y - res.Y);
+
+                    firstPoint = temp;
+                }
+            };
         }
-    }
+    }   
 }
