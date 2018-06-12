@@ -135,6 +135,17 @@ namespace WindowsFormsApp2
             }
 
         }
+        private void paa(object sender, MouseEventArgs e)
+        {
+            foreach (Control item in this.panel1.Controls)
+            {
+                item.MouseDown += panel1_MouseDown;
+                item.MouseUp += panel1_MouseUp;
+                item.MouseMove += panel1_MouseMove;
+
+            }
+
+        }
         //MouseUp
         private void panel1_MouseUp(object sender, MouseEventArgs e)
         {
@@ -190,11 +201,7 @@ namespace WindowsFormsApp2
                     //write binary in text file
                     w.Write(Location_x);
                     w.Write(Location_y);
-
-
-
                 }
-
             }
             //File.WriteAllText("file1.txt", txt3);
             //int 32

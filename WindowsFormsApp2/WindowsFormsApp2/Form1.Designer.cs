@@ -123,9 +123,6 @@
             this.panel1.Size = new System.Drawing.Size(249, 380);
             this.panel1.TabIndex = 8;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
-            //this.panel1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseDown);
-            //this.panel1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseMove);
-            //this.panel1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseUp);
             // 
             // button5
             // 
@@ -143,7 +140,7 @@
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(91, 30);
             this.button6.TabIndex = 10;
-            this.button6.Text = "Save Location";
+            this.button6.Text = "Save ";
             this.button6.UseVisualStyleBackColor = true;
             this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
@@ -153,7 +150,7 @@
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(91, 33);
             this.button7.TabIndex = 11;
-            this.button7.Text = "Show";
+            this.button7.Text = "Load";
             this.button7.UseVisualStyleBackColor = true;
             this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
