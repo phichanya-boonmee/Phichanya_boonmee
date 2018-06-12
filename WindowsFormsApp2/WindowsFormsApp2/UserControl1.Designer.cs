@@ -38,6 +38,8 @@
             this.Name = "UserControl1";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.UserControl1_KeyDown);
             this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.UserControl1_KeyPress);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.UserControl1_KeyUp);
+            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.UserControl1_MouseDown_1);
             this.ResumeLayout(false);
 
         }

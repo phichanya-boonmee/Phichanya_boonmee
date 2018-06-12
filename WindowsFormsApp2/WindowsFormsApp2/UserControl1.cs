@@ -30,6 +30,7 @@ namespace WindowsFormsApp2
         {
             this.MouseDown += UserControl1_MouseDown;
             this.MouseUp += UserControl1_MouseUp;
+            this.MouseDown += UserControl1_MouseDown_1;
             //----------------------------------------
             this.Focus();
 
@@ -46,6 +47,8 @@ namespace WindowsFormsApp2
             myPanel.MouseUp += UserControl1_MouseUp; 
             myPanel.MouseMove += UserControl1_MouseMove;        
             myPanel.KeyDown += UserControl1_KeyDown;
+           // myPanel.MouseDown += UserControl1_MouseDown_1;
+
             
 
             this.Controls.Add(myPanel);
@@ -53,22 +56,7 @@ namespace WindowsFormsApp2
 
         }
        
-        private void Clear_Mouse(object sender, MouseEventArgs e)
-        {
-          
-           
-            foreach (Control item in this.Controls)
-            {
-
-                item.Controls.Clear();
-                if (item.BackColor == Color.Yellow)
-                {
-                    item.BackColor = Color.Blue;
-                }
-
-            }
-          
-        }
+      
 
         Point MouseDownLocation;    
         private void UserControl1_MouseDown(object sender, MouseEventArgs e)
@@ -76,9 +64,9 @@ namespace WindowsFormsApp2
             
             MouseDownLocation = e.Location;
             //case press ctrl
-            if (Control.ModifierKeys == Keys.Control || e.Button == MouseButtons.Left) 
+            if (Control.ModifierKeys == Keys.Control || e.Button == MouseButtons.Left)
             {
-                
+
                 Control item = (Control)sender;
                 item.BackColor = Color.Yellow;
                 L_x = e.X;
@@ -87,19 +75,17 @@ namespace WindowsFormsApp2
                 {
                     SelectedControls.Add(item);
                 }
-               
+
                 //กดctrlนะ
 
                 //Console.WriteLine(SelecttedControls.Count);
             }
-            
 
-            
-            
+
             //case don't press ctrl
             else if (e.Button == MouseButtons.Left)
             {
-                
+
                 Control item = (Control)sender;
                 item.BackColor = Color.Yellow;
                 L_x = e.X;
@@ -108,30 +94,35 @@ namespace WindowsFormsApp2
                 {
                     SelectedControls.Add(item);
                 }
-                   
-                
+
+
             }
+           
        
         }
 
         private void UserControl1_MouseUp(object sender, MouseEventArgs e)
         {
-            
-            
+
+
             //case1 press ctrl
-            if (Control.ModifierKeys == Keys.Control || SelectedControls.Count !=1)
+           
+            if (Control.ModifierKeys == Keys.Control || SelectedControls.Count > 1)
             {
-                
+                //MessageBox.Show("Yes");
                 Control item = (Control)sender;
                 item.BackColor = Color.Yellow;
-                
+               
+
+
             }
             //case2 don't press ctrl
             else
-            {               
+            {
+                //MessageBox.Show("No");
                 Control item = (Control)sender;
                 item.BackColor = Color.Blue;               
-                SelectedControls.Clear();
+                
             }    
         }
         //Move
@@ -178,20 +169,38 @@ namespace WindowsFormsApp2
             
             else if (e.KeyCode == Keys.Delete)
             {
-                foreach (Control item in this.Controls)
+                Console.WriteLine(SelectedControls.Count);
+                foreach (Control item in SelectedControls)
                 {
-                  
-                    item.Controls.Clear();
-                    if(item.BackColor == Color.Yellow)
-                    {
-                        item.BackColor = Color.Blue;
-                    }
+                           
+                    Controls.Remove(item);
                     
                 }
+                SelectedControls.Clear();
+                this.Focus();
             }
         }
-      
-      
+
+        private void UserControl1_MouseDown_1(object sender, MouseEventArgs e)
+        {
+            foreach (Control item in this.Controls)
+            {
+
+                item.Controls.Clear();
+                if (item.BackColor == Color.Yellow)
+                {
+                    item.BackColor = Color.Blue;
+                }
+
+            }
+            SelectedControls.Clear();
+        }
+
+        private void UserControl1_KeyUp(object sender, KeyEventArgs e)
+        {
+            //this.Focus();
+        }
+
         private void UserControl1_KeyPress(object sender, KeyPressEventArgs e)
         {
             
