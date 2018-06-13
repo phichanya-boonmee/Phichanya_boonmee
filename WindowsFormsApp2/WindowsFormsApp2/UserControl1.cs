@@ -15,9 +15,11 @@ namespace WindowsFormsApp2
     public partial class UserControl1 : UserControl
     {
         
-        //bool Set_CtrlA = false; //select All?
-        //bool status_Ctrl = false; //ไม่ได้กด ctrl
+        
         int L_x, L_y;
+        List<PanelObjectHistory> _undoList = new List<PanelObjectHistory>();
+        List<PanelObjectHistory> _redoList = new List<PanelObjectHistory>();
+        List<PanelObjectHistory> _objHxList = new List<PanelObjectHistory>();
         List<Control> SelectedControls = new List<Control>();
 
         public UserControl1()
@@ -56,7 +58,18 @@ namespace WindowsFormsApp2
 
         }
        
-      
+        public string RefreshHxBox()
+        {
+            StringBuilder stbuilder = new StringBuilder();
+            int j = _objHxList.Count;
+            for (int i = 0; i < j; ++i)
+            {
+                stbuilder.AppendLine(_objHxList[i].ToString());
+            }
+            return stbuilder.ToString();
+
+        }
+        
 
         Point MouseDownLocation;    
         private void UserControl1_MouseDown(object sender, MouseEventArgs e)
@@ -75,7 +88,22 @@ namespace WindowsFormsApp2
                 {
                     SelectedControls.Add(item);
                 }
+                //------------------------------------------------------
+                int j = SelectedControls.Count;
+                for (int i = 0; i < j; ++i)
+                {
+                   
+                    PanelObjectHistory hx = new PanelObjectHistory();
+                    hx.targetPanel = SelectedControls[i];
+                    hx.color = SelectedControls[i].BackColor;
+                    hx.X = SelectedControls[i].Location.X;
+                    hx.Y = SelectedControls[i].Location.Y;
+                    hx.command = CommandKind.BgColor;
+                    _objHxList.Add(hx);
+                    _undoList.Add(hx);
 
+                }
+                RefreshHxBox();
                 //กดctrlนะ
 
                 //Console.WriteLine(SelecttedControls.Count);
@@ -94,6 +122,24 @@ namespace WindowsFormsApp2
                 {
                     SelectedControls.Add(item);
                 }
+                //---------------------------------------------
+                int j = SelectedControls.Count;
+                for (int i = 0; i < j; ++i)
+                {
+
+                    PanelObjectHistory hx = new PanelObjectHistory();
+                    hx.targetPanel = SelectedControls[i];
+                    //hx.color = SelectedControls[i].BackColor;
+                    hx.X = SelectedControls[i].Location.X;
+                    hx.Y = SelectedControls[i].Location.Y;
+                    hx.command = CommandKind.BgColor;
+                    _objHxList.Add(hx);
+                    _undoList.Add(hx);
+
+                 
+
+                }
+                RefreshHxBox();
 
 
             }
@@ -113,16 +159,16 @@ namespace WindowsFormsApp2
                 Control item = (Control)sender;
                 item.BackColor = Color.Yellow;
                
-
-
             }
+           
             //case2 don't press ctrl
             else
             {
                 //MessageBox.Show("No");
                 Control item = (Control)sender;
-                item.BackColor = Color.Blue;               
-                
+                item.BackColor = Color.Blue;
+                SelectedControls.Clear();
+
             }    
         }
         //Move
@@ -151,8 +197,10 @@ namespace WindowsFormsApp2
         private void UserControl1_KeyDown(object sender, KeyEventArgs e)
         {          
             if (e.KeyCode == Keys.A && e.Modifiers == Keys.Control)
-            {   
-                 foreach (Control item in this.Controls)
+            {
+                Console.WriteLine("A");
+                
+                foreach (Control item in this.Controls)
                 {
                     item.BackColor = Color.Yellow;
                  
@@ -164,12 +212,12 @@ namespace WindowsFormsApp2
                    
                     
                 }
-                Console.WriteLine(SelectedControls.Count);
+                //Console.WriteLine(SelectedControls.Count);
             }
-            
+
             else if (e.KeyCode == Keys.Delete)
             {
-                Console.WriteLine(SelectedControls.Count);
+                //Console.WriteLine(SelectedControls.Count);
                 foreach (Control item in SelectedControls)
                 {
                            
@@ -178,6 +226,31 @@ namespace WindowsFormsApp2
                 }
                 SelectedControls.Clear();
                 this.Focus();
+            }
+            //Undo
+            else if (e.KeyCode == Keys.Z && e.Modifiers == Keys.Control)
+            {
+
+                Console.WriteLine("Z");
+                int j = _undoList.Count;
+                if (_undoList.Count > 0)
+                {
+                                    
+                        PanelObjectHistory latestHx = _undoList[_undoList.Count - 1];
+                        _undoList.RemoveAt(_undoList.Count - 1);
+                        latestHx.targetPanel.Location = new Point(latestHx.X, latestHx.Y);
+                        _redoList.Add(latestHx);
+
+                }
+                //this.Focus();
+
+
+
+            }
+            //Redo
+            else if(e.KeyCode == Keys.Y || e.Modifiers == Keys.Control)
+            {
+
             }
         }
 
@@ -190,9 +263,11 @@ namespace WindowsFormsApp2
                 if (item.BackColor == Color.Yellow)
                 {
                     item.BackColor = Color.Blue;
+                    
                 }
 
             }
+            
             SelectedControls.Clear();
         }
 
@@ -206,6 +281,33 @@ namespace WindowsFormsApp2
             
 
 
-        }       
+        }
+        enum CommandKind
+        {
+            Unknown,
+            Position,
+            BgColor
+        }
+        class PanelObjectHistory
+        {
+            public Control targetPanel;
+            public int X;
+            public int Y;
+            public Color color;
+            public CommandKind command;
+
+            public override string ToString()
+            {
+                if (targetPanel.Tag != null)
+                {
+                    return command + "," + (int)targetPanel.Tag + ":" + X + "," + Y + "," + color;
+                }
+                else
+                {
+                    return command + "," + X + "," + Y + "," + color;
+                }
+
+            }
+        }
     }
 }

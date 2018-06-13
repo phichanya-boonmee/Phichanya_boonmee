@@ -54,6 +54,7 @@ namespace WindowsFormsApp2
                     w.Write(Location_y);
                 }
             }
+
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -72,6 +73,21 @@ namespace WindowsFormsApp2
                     userControl1.AddNewBox(Location_x,Location_y);
                 }
             }
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+           
+            
+
+
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+          
+            this.textBox2.Text = userControl1.RefreshHxBox();
+
         }
     }
 }
