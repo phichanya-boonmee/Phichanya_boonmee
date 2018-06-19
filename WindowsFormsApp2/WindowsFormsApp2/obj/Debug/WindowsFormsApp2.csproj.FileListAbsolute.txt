@@ -80,3 +80,6 @@ C:\Users\phichanya_boonmee\Documents\GitHub\Phichanya_boonmee\WindowsFormsApp2\W
 C:\Users\phichanya_boonmee\Documents\GitHub\Phichanya_boonmee\WindowsFormsApp2\WindowsFormsApp2\obj\Debug\WindowsFormsApp2.csproj.CoreCompileInputs.cache
 C:\Users\phichanya_boonmee\Documents\GitHub\Phichanya_boonmee\WindowsFormsApp2\WindowsFormsApp2\obj\Debug\WindowsFormsApp2.exe
 C:\Users\phichanya_boonmee\Documents\GitHub\Phichanya_boonmee\WindowsFormsApp2\WindowsFormsApp2\obj\Debug\WindowsFormsApp2.pdb
+C:\Users\phichanya_boonmee\Documents\GitHub\Phichanya_boonmee\WindowsFormsApp2\WindowsFormsApp2\bin\Debug\Newtonsoft.Json.dll
+C:\Users\phichanya_boonmee\Documents\GitHub\Phichanya_boonmee\WindowsFormsApp2\WindowsFormsApp2\bin\Debug\Newtonsoft.Json.xml
+C:\Users\phichanya_boonmee\Documents\GitHub\Phichanya_boonmee\WindowsFormsApp2\WindowsFormsApp2\obj\Debug\WindowsFormsApp2.csproj.CopyComplete

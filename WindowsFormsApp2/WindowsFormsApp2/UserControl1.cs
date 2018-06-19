@@ -105,15 +105,11 @@ namespace WindowsFormsApp2
                     PanelObjectHistory hx = new PanelObjectHistory(item.Left, item.Top, item);
                     hx.targetPanel.Location = item.Location;
                     
-
-
                     _undoList.Add(hx);
                     _objHxList.Add(hx);
 
                 }
                 RefreshHxBox();
-
-
             }
         }
       
@@ -143,21 +139,6 @@ namespace WindowsFormsApp2
 
                 }
                 RefreshHxBox();
-                //------------------------------------------------------
-                //int j = SelectedControls.Count;
-                //for (int i = 0; i < j; ++i)
-                //{
-                //    PanelObjectHistory hx = new PanelObjectHistory();
-                //    hx.targetPanel = SelectedControls[i];
-                //    //hx.color = SelectedControls[i].BackColor;
-                //    hx.x = SelectedControls[i].Location.X;
-                //    hx.y = SelectedControls[i].Location.Y;
-                //    hx.command = CommandKind.BgColor;
-                //    _objHxList.Add(hx);
-                //    _undoList.Add(hx);
-                //}
-
-
             }
 
 
@@ -165,13 +146,13 @@ namespace WindowsFormsApp2
             else if (e.Button == MouseButtons.Left)
             {
                 
-                //-----------------------------------------------
+                //----------------------------------------------------------------------------
                 
                 item.BackColor = Color.Yellow;
                 L_x = e.X;
                 L_y = e.Y;
 
-                //-----------------------------------------------
+                //----------------------------------------------------------------------------
                 if (!SelectedControls.Contains(item))
                 {
                    
@@ -185,20 +166,6 @@ namespace WindowsFormsApp2
 
                 }
                 RefreshHxBox();
-                //---------------------------------------------
-                //int j = SelectedControls.Count;
-                //for (int i = 0; i < j; ++i)
-                //{
-                //    PanelObjectHistory hx = new PanelObjectHistory();
-                //    hx.targetPanel = SelectedControls[i];
-                //    //hx.color = SelectedControls[i].BackColor;
-                //    hx.x = SelectedControls[i].Location.X;
-                //    hx.y = SelectedControls[i].Location.Y;
-                //    hx.command = CommandKind.BgColor;
-                //    _objHxList.Add(hx);
-                //    _undoList.Add(hx);
-                //}
-
             }
 
         }
@@ -256,7 +223,6 @@ namespace WindowsFormsApp2
                 {
                     Control pp = (Control)item;
                     pp.Location = new Point(pp.Left + dx, pp.Top + dy);
-                    //item.BackColor = Color.Yellow;
                                               
                 }
             }
@@ -276,15 +242,11 @@ namespace WindowsFormsApp2
                         if (!SelectedControls.Contains(item))
                         {
                             PanelObjectHistory hx = new PanelObjectHistory(item.Left, item.Top, item);
-                            //hx.targetPanel = item as Control;
-                            //hx.x = item.Left;
-                            //hx.y = item.Top;
                             SelectedControls.Add(item);
                             hx.targetPanel.Location = item.Location;
                             _undoList.Add(hx);
 
-                        }
-                        //item.BackColor = Color.Yellow;
+                        }                    
 
                     }
                 }
@@ -324,12 +286,9 @@ namespace WindowsFormsApp2
 
                         Control thisPo = _undoList[_undoList.Count - 1].targetPanel;
                         PanelObjectHistory hx = new PanelObjectHistory(thisPo.Left, thisPo.Top, thisPo);
-                        PanelObjectHistory lastestHx = _undoList[_undoList.Count - 1];
-                        //_undoList.RemoveAt(_undoList.Count - 1);
-                        _redoList.Add(hx);
-                        ////lastestHx.targetPanel.Location = new Point(lastestHx.x, lastestHx.y);
-                        lastestHx.targetPanel.Location = new Point(lastestHx.x, lastestHx.y);
-                        //_redoList.Add(lastestHx);
+                        PanelObjectHistory lastestHx = _undoList[_undoList.Count - 1];                
+                        _redoList.Add(hx);                        
+                        lastestHx.targetPanel.Location = new Point(lastestHx.x, lastestHx.y);                       
                         _undoList.RemoveAt(_undoList.Count - 1);
 
                         //------------------------------------------------------------------------------------
@@ -408,8 +367,6 @@ namespace WindowsFormsApp2
             
             SelectedControls.Clear();
             
-
-
         }
 
         private void UserControl1_KeyUp(object sender, KeyEventArgs e)
