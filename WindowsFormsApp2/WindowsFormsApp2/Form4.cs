@@ -26,16 +26,15 @@ namespace WindowsFormsApp2
             
             for (int i = 0; i < count; ++i)
             {
-                userControl1.AddNewBox(i * 10, i * 10);
+                userControl1.AddNewBox(i * 10, i * 10, i);
             }
 
         }
 
         public class Position
         {
-
-            public int x;
-            public int y;
+            public int X;
+            public int Y;
         }
         List<Position> List_location = new List<Position>();
 
@@ -44,12 +43,16 @@ namespace WindowsFormsApp2
             
         }
 
+        //Save location
 
-      
-        //SAVE locatio
         private void button2_Click(object sender, EventArgs e)
         {
+            //Clear List after click button Save again
 
+         
+            //userControl1.Write_Json();
+            
+          
             List_location.Clear();
             using (FileStream fs = new FileStream("Json.json", FileMode.Create))
             using (StreamWriter file = new StreamWriter(fs))
@@ -60,25 +63,24 @@ namespace WindowsFormsApp2
                 foreach (Control item in userControl1.Controls)
                 {     
                     Position po = new Position();
-                    po.x = item.Left;
-                    po.y = item.Top;              
+                    po.X = item.Left;
+                    po.Y = item.Top;              
                     List_location.Add(po);
                
                     Console.WriteLine(List_location.Count);
                    
                 }
-                Position.Serialize(w, List_location);
-                
+                Position.Serialize(w, List_location);              
             }
                          
         }
-
+        //Load file Json
         private void button3_Click(object sender, EventArgs e)
         {
 
             //clear panel
-            userControl1.Controls.Clear();
 
+            userControl1.Controls.Clear();
             using (FileStream fs = new FileStream("Json.json", FileMode.Open))
             using (StreamReader file = new StreamReader(fs))
             using (JsonReader w = new JsonTextReader(file))
@@ -86,29 +88,23 @@ namespace WindowsFormsApp2
                 //Position po = new Position();
                 JsonSerializer Position = new JsonSerializer();              
                 List<Position> positions = JsonConvert.DeserializeObject<List<Position>>(file.ReadToEnd());
-
+                Console.WriteLine(positions[0].X);
                 //----------------------------------------------------------------------------------------
-
-                for(int i=0; i<=List_location.Count-1;i++)
-                {
-                  
-                    int Location_x = positions[i].x;
-                    int Location_y = positions[i].y;
-
-                    userControl1.AddNewBox(Location_x, Location_y);
-                }
-                
                 Console.WriteLine(List_location.Count);
+                for (int i=0; i<=positions.Count-1;i++)
+                {                
+                    int Location_x = positions[i].X;
+                    int Location_y = positions[i].Y;
+                    userControl1.AddNewBox(Location_x, Location_y,0);
 
+                }               
+                Console.WriteLine(List_location.Count);
             }
         }
 
         private void textBox2_TextChanged(object sender, EventArgs e)
         {
            
-            
-
-
         }
 
         private void button6_Click(object sender, EventArgs e)

@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Drawing.Drawing2D;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 
 namespace WindowsFormsApp2
@@ -18,49 +20,50 @@ namespace WindowsFormsApp2
 
 
         int L_x, L_y;
-        Point selectionStart;
-        Point selectionEnd;
-        Rectangle selection;
         bool mouseDown;
-        //bool drawing;        // busy drawing
-        List<Rectangle> rectangles = new List<Rectangle>();  // previous rectangles
-        List<PanelObjectHistory> _undoList = new List<PanelObjectHistory>();
-        List<PanelObjectHistory> _redoList = new List<PanelObjectHistory>();
-        List<PanelObjectHistory> _objHxList = new List<PanelObjectHistory>();
-        List<int> _selectCount = new List<int>();
-        List<int> _selectCount_redo = new List<int>();
-        List<Control> SelectedControls = new List<Control>();
+        //-------------------------------------------------------------------------------------
+        Point selectionStart; //Point Start Mouse Drag
+        Point selectionEnd;   //Point End Mouse Drag
+        Rectangle selection;    
+        List<Rectangle> rectangles = new List<Rectangle>(); //list rectangles Mouse Drag
+        //-------------------------------------------------------------------------------------
+        List<PanelObjectHistory> _undoList = new List<PanelObjectHistory>();  // list Undo
+        List<PanelObjectHistory> _redoList = new List<PanelObjectHistory>();  // list redo
+        List<PanelObjectHistory> _objHxList = new List<PanelObjectHistory>(); // list history
+        //-------------------------------------------------------------------------------------
+        List<int> _selectCount = new List<int>();  // list count Undo
+        List<int> _selectCount_redo = new List<int>();   // list count Redo
+        //-------------------------------------------------------------------------------------
+        List<Control> SelectedControls = new List<Control>(); //list count select Yellow box
+        //-------------------------------------------------------------------------------------
+        
 
         public UserControl1()
         {
             InitializeComponent();
         }
-
-
         private void UserControl1_Load(object sender, EventArgs e)
         {
             this.MouseDown += UserControl1_MouseDown;
             this.MouseUp += UserControl1_MouseUp;
             this.MouseDown += UserControl1_MouseDown_1;
-            //----------------------------------------
+            //----------------------------------------------
             this.Focus();
 
         }
-        public void AddNewBox(int x, int y)
-        {
-            
+        public void AddNewBox(int x, int y, int t)
+        {            
             Panel myPanel = new Panel();
             myPanel.Size = new Size(10, 10);
             myPanel.Location = new Point(x, y);
             myPanel.BackColor = Color.Blue;
-
+            myPanel.Tag = t;
+            //-------------------------------------------------------
             myPanel.MouseDown += UserControl1_MouseDown;
             myPanel.MouseUp += UserControl1_MouseUp;
             myPanel.MouseMove += UserControl1_MouseMove;
             myPanel.KeyDown += UserControl1_KeyDown;
             // myPanel.MouseDown += UserControl1_MouseDown_1;
-
-
 
             this.Controls.Add(myPanel);
             this.Focus();
@@ -96,8 +99,7 @@ namespace WindowsFormsApp2
             //-------------------------------------------------------------------------------------------------------------------
 
             foreach (Control item in this.Controls)
-            {
-                
+            {               
                 if (selection.Contains(item.Bounds))
                 {
                     item.BackColor = Color.Yellow;
@@ -107,16 +109,15 @@ namespace WindowsFormsApp2
                     
                     _undoList.Add(hx);
                     _objHxList.Add(hx);
+                    Write_Json();
 
                 }
                 RefreshHxBox();
             }
-        }
-      
+        }     
         Point MouseDownLocation;
         private void UserControl1_MouseDown(object sender, MouseEventArgs e)
-        {
-            
+        {          
             MouseDownLocation = e.Location;
             Control item = (Control)sender;
             //case press ctrl
@@ -133,88 +134,70 @@ namespace WindowsFormsApp2
                     PanelObjectHistory hx = new PanelObjectHistory(item.Left, item.Top, item);                   
                     hx.targetPanel.Location = item.Location;
                  
-
                     _undoList.Add(hx);
                     _objHxList.Add(hx);
+                    Write_Json();
 
                 }
                 RefreshHxBox();
             }
-
-
             //case don't press ctrl
             else if (e.Button == MouseButtons.Left)
-            {
-                
-                //----------------------------------------------------------------------------
-                
+            {             
                 item.BackColor = Color.Yellow;
                 L_x = e.X;
                 L_y = e.Y;
 
                 //----------------------------------------------------------------------------
                 if (!SelectedControls.Contains(item))
-                {
-                   
+                {                   
                     SelectedControls.Add(item);
                     PanelObjectHistory hx = new PanelObjectHistory(item.Left, item.Top, item);
                     hx.targetPanel.Location = item.Location;
-                    
 
                     _undoList.Add(hx);
                     _objHxList.Add(hx);
+                    Write_Json();
 
                 }
                 RefreshHxBox();
             }
-
         }
-
         private void UserControl1_MouseUp(object sender, MouseEventArgs e)
-        {
-            
-            //case1 press ctrlA
+        {          
+            //case1 press ctrl
             Control item = (Control)sender;
 
            if (Control.ModifierKeys == Keys.Control || SelectedControls.Count > 1)
             {
-
                 //MessageBox.Show("CtrlA");          
                 item.BackColor = Color.Yellow;
                 if(Control.ModifierKeys != Keys.Control)
                 {
                     _selectCount.Add(SelectedControls.Count);
-                }
-                
+                    SelectCount();
+                }                
             }
-
-
             //case2 don't press ctrl
             else
-            {
-                
-                //-----------------------------------------------------------------------------
+            {                            
                 if (Control.ModifierKeys != Keys.Control)
                 {
                    
                     _selectCount.Add(SelectedControls.Count);
+                    SelectCount();
                 }
                 //MessageBox.Show("No");              
                 item.BackColor = Color.Blue;
-                SelectedControls.Clear();
-               
+                SelectedControls.Clear();             
             }
-            this.Focus();
-           
+            this.Focus();          
         }
         //Move
         private void UserControl1_MouseMove(object sender, MouseEventArgs e)
-        {
-          
-          
+        {         
             if (e.Button == MouseButtons.Left) 
-            {
-         
+            {       
                 int dx = e.X - L_x;
                 int dy = e.Y - L_y;
                 Control p = (Control)sender;
@@ -222,11 +205,9 @@ namespace WindowsFormsApp2
                 foreach (Control item in SelectedControls)
                 {
                     Control pp = (Control)item;
-                    pp.Location = new Point(pp.Left + dx, pp.Top + dy);
-                                              
+                    pp.Location = new Point(pp.Left + dx, pp.Top + dy);                                              
                 }
-            }
-           
+            }          
         }
         private void UserControl1_KeyDown(object sender, KeyEventArgs e)
         {          
@@ -245,12 +226,11 @@ namespace WindowsFormsApp2
                             SelectedControls.Add(item);
                             hx.targetPanel.Location = item.Location;
                             _undoList.Add(hx);
-
+                            //Write_Json();
                         }                    
 
                     }
-                }
-               
+                }              
                 this.Focus();
                 //Console.WriteLine(SelectedControls.Count);
             }
@@ -270,7 +250,7 @@ namespace WindowsFormsApp2
             //Undo
             else if (e.KeyCode == Keys.Z && e.Modifiers == Keys.Control)
             {
-
+                
                 Console.WriteLine("Z");
                 Console.WriteLine("history ={0}", _undoList.Count);
 
@@ -278,30 +258,22 @@ namespace WindowsFormsApp2
                 {
                     for (int i =0; i < _selectCount[_selectCount.Count - 1]; i++)
                     {
-                    
-
                         Console.WriteLine("Undo" + _undoList[_undoList.Count - 1].targetPanel.Location);
-
+                        Control thisPo = _undoList[_undoList.Count - 1].targetPanel;
                         //----------------------------------------------------------------------------------
 
-                        Control thisPo = _undoList[_undoList.Count - 1].targetPanel;
                         PanelObjectHistory hx = new PanelObjectHistory(thisPo.Left, thisPo.Top, thisPo);
                         PanelObjectHistory lastestHx = _undoList[_undoList.Count - 1];                
                         _redoList.Add(hx);                        
-                        lastestHx.targetPanel.Location = new Point(lastestHx.x, lastestHx.y);                       
+                        lastestHx.targetPanel.Location = new Point(List_Undoocation[i].X, List_Undoocation[i].Y);                       
                         _undoList.RemoveAt(_undoList.Count - 1);
+                        //-----------------------------------------------------------------------------------
 
-                        //------------------------------------------------------------------------------------
                         Console.WriteLine("Redo" + _redoList[_redoList.Count - 1].targetPanel.Location);
-
                     }
                     _selectCount_redo.Add(_selectCount[_selectCount.Count - 1]);
                     _selectCount.RemoveAt(_selectCount.Count - 1);
-
-                }
-                
-
-
+                }                
                 RefreshHxBox();
 
                 //this.Focus();
@@ -315,12 +287,11 @@ namespace WindowsFormsApp2
                 if (_redoList.Count > 0)
                 {
                     for (int i = 0; i < _selectCount_redo[_selectCount_redo.Count - 1]; i++)
-                    {
-                    
+                    {                    
                         Console.WriteLine("Redo" + _redoList[_redoList.Count - 1].targetPanel.Location);
-
-                        //--------------------------------------------------------------------------------------
                         Control thisPo = _redoList[_redoList.Count - 1].targetPanel;
+                        //--------------------------------------------------------------------------------------
+
                         PanelObjectHistory hx = new PanelObjectHistory(thisPo.Left, thisPo.Top, thisPo);
                         PanelObjectHistory lastestHx = _redoList[_redoList.Count - 1];
                         //_undoList.RemoveAt(_undoList.Count - 1);
@@ -329,22 +300,15 @@ namespace WindowsFormsApp2
                         lastestHx.targetPanel.Location = new Point(lastestHx.x, lastestHx.y);
                         //_redoList.Add(lastestHx);
                         _redoList.RemoveAt(_redoList.Count - 1);
-                        
-
                         //---------------------------------------------------------------------------------------
-                        Console.WriteLine("Undo" + _undoList[_undoList.Count - 1].targetPanel.Location);
 
-                    }
-              
+                        Console.WriteLine("Undo" + _undoList[_undoList.Count - 1].targetPanel.Location);
+                    }            
                     _selectCount.Add(_selectCount_redo[_selectCount_redo.Count - 1]);
                     _selectCount_redo.RemoveAt(_selectCount_redo.Count - 1);
-
                 }
-
-
             }
         }
-
         private void UserControl1_MouseDown_1(object sender, MouseEventArgs e)
         {
             if(e.Button == MouseButtons.Left)
@@ -353,33 +317,104 @@ namespace WindowsFormsApp2
                 mouseDown = true;
                
             }
-
             foreach (Control item in this.Controls)
             {
-
                 item.Controls.Clear();
                 if (item.BackColor == Color.Yellow)
                 {
                     item.BackColor = Color.Blue;
-                }
-               
-            }
-            
-            SelectedControls.Clear();
-            
+                }              
+            }            
+            SelectedControls.Clear();            
         }
+        public void Write_Json()
+        {
+            //Clear List after click button Save again
+            List_Undoocation.Clear();
+            //_undoList.Clear();
+            using (FileStream fs = new FileStream("Undo_Json.json", FileMode.Create))
+            using (StreamWriter file = new StreamWriter(fs))
+            using (JsonWriter w = new JsonTextWriter(file))
+            {
+                JsonSerializer Position = new JsonSerializer();
 
+                for (int i = 0; i <= _undoList.Count - 1; i++)
+                {
+                    //Control item = (Control)sender;
+                    Position po = new Position();
+                    po.X = _undoList[i].x;
+                    po.Y = _undoList[i].y;
+                    po.T = (int)_undoList[i].targetPanel.Tag;
+                    List_Undoocation.Add(po);
+                    
+                   
+
+                    Console.WriteLine(List_Undoocation.Count);
+                    
+                }
+                Position.Serialize(w, List_Undoocation);
+                
+                
+            }
+          
+        }
+        public void Read_Json()
+        {
+            List_Undoocation.Clear();
+            using (FileStream fs = new FileStream("Json.json", FileMode.Open))
+            using (StreamReader file = new StreamReader(fs))
+            using (JsonReader w = new JsonTextReader(file))
+            {
+                
+                JsonSerializer Position = new JsonSerializer();
+                List<Position> positions = JsonConvert.DeserializeObject<List<Position>>(file.ReadToEnd());
+                Console.WriteLine(positions[0].X);
+                //----------------------------------------------------------------------------------------
+                Console.WriteLine(List_Undoocation.Count);
+                for (int i = 0; i <= positions.Count - 1; i++)
+                {
+                    int myTag = positions[i].T;
+                    int Location_x = positions[i].X;
+                    int Location_y = positions[i].Y;
+                    
+                    AddNewBox(Location_x, Location_y, myTag);
+                    
+
+                }
+                Console.WriteLine(List_Undoocation.Count);
+            }
+        }
+        public void SelectCount()
+        {
+            using (FileStream fs = new FileStream("Tag_Json.json", FileMode.Create))
+            using (StreamWriter file = new StreamWriter(fs))
+            using (JsonWriter w = new JsonTextWriter(file))
+            {
+                //JArray array = new JArray();
+                JsonSerializer Position = new JsonSerializer();
+
+                Position.Serialize(w, _selectCount);
+            }
+        }
         private void UserControl1_KeyUp(object sender, KeyEventArgs e)
         {
             //this.Focus();
         }
-
         private void UserControl1_KeyPress(object sender, KeyPressEventArgs e)
         {
             
 
 
         }
+        public class Position
+        {
+            public int T;
+            public int X;
+            public int Y;
+            
+        }
+        List<Position> List_Undoocation = new List<Position>();
+        
         enum CommandKind
         {
             Unknown,
@@ -392,14 +427,9 @@ namespace WindowsFormsApp2
             mouseDown = false;
             selectionEnd = e.Location;
             SetSelectionRect();
-            
-
-
         }
-
         class PanelObjectHistory
-        {
-            
+        {           
             public readonly int x;
             public readonly int y;
             public readonly Control targetPanel;
@@ -421,7 +451,6 @@ namespace WindowsFormsApp2
                 {
                     return command + "," + x + "," + y + "," + color;
                 }
-
             }
         }
     }
