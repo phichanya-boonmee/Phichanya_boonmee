@@ -48,7 +48,7 @@ namespace WindowsFormsApp2
         }
         public void AddNewBox(int x, int y)
         {
-
+            
             Panel myPanel = new Panel();
             myPanel.Size = new Size(10, 10);
             myPanel.Location = new Point(x, y);

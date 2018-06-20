@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.IO;
 
 namespace WindowsFormsApp2
@@ -48,14 +49,15 @@ namespace WindowsFormsApp2
         //SAVE locatio
         private void button2_Click(object sender, EventArgs e)
         {
-            JsonSerializer Position = new JsonSerializer();
 
+            List_location.Clear();
             using (FileStream fs = new FileStream("Json.json", FileMode.Create))
             using (StreamWriter file = new StreamWriter(fs))
             using (JsonWriter w = new JsonTextWriter(file))
             {
-                
-                foreach(Control item in userControl1.Controls)
+                JsonSerializer Position = new JsonSerializer();
+
+                foreach (Control item in userControl1.Controls)
                 {     
                     Position po = new Position();
                     po.x = item.Left;
@@ -66,46 +68,37 @@ namespace WindowsFormsApp2
                    
                 }
                 Position.Serialize(w, List_location);
-
+                
             }
                          
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
+
             //clear panel
-            //userControl1.Controls.Clear();
-
-            //using (FileStream fs = new FileStream("textJson.json", FileMode.Open))
-
-            //using (BinaryReader w = new BinaryReader(fs))
-            //{
-            //    //Loop create item
-            //    while (w.BaseStream.Position != w.BaseStream.Length)
-            //    {
-            //        int Location_x = w.ReadInt32();
-            //        int Location_y = w.ReadInt32();
-            //        userControl1.AddNewBox(Location_x, Location_y);
-            //    }
-            //}
             userControl1.Controls.Clear();
-            JsonSerializer Position = new JsonSerializer();
 
             using (FileStream fs = new FileStream("Json.json", FileMode.Open))
             using (StreamReader file = new StreamReader(fs))
             using (JsonReader w = new JsonTextReader(file))
-            {              
-                while (file.BaseStream.Position != file.BaseStream.Length)
+            {
+                //Position po = new Position();
+                JsonSerializer Position = new JsonSerializer();              
+                List<Position> positions = JsonConvert.DeserializeObject<List<Position>>(file.ReadToEnd());
+
+                //----------------------------------------------------------------------------------------
+
+                for(int i=0; i<=List_location.Count-1;i++)
                 {
-                    Position po = new Position();
-                    //List<int> location_D = JsonConvert.DeserializeObject<List<int>>(w);
-                    //Console.WriteLine(string.Join(", ", location_D.ToArray()));
+                  
+                    int Location_x = positions[i].x;
+                    int Location_y = positions[i].y;
 
-                    //int Location_x = w.ReadInt32();
-                    //int Location_y = w.ReadInt32();
-                    //userControl1.AddNewBox(Location_x, Location_y);
-
+                    userControl1.AddNewBox(Location_x, Location_y);
                 }
+                
+                Console.WriteLine(List_location.Count);
 
             }
         }
