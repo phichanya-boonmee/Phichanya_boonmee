@@ -24,7 +24,7 @@ namespace WindowsFormsApp2
         {
             int count = Int32.Parse(textBox1.Text);
             
-            for (int i = 0; i < count; ++i)
+            for (int i = 0; i < count; i++)
             {
                 userControl1.AddNewBox(i * 10, i * 10, i);
             }
@@ -48,13 +48,10 @@ namespace WindowsFormsApp2
         private void button2_Click(object sender, EventArgs e)
         {
             //Clear List after click button Save again
-
-         
-            //userControl1.Write_Json();
-            
-          
+            userControl1.Write_Json();
+            userControl1.SelectCount();
             List_location.Clear();
-            using (FileStream fs = new FileStream("Json.json", FileMode.Create))
+            using (FileStream fs = new FileStream("SavePanel.json", FileMode.Create))
             using (StreamWriter file = new StreamWriter(fs))
             using (JsonWriter w = new JsonTextWriter(file))
             {
@@ -67,7 +64,7 @@ namespace WindowsFormsApp2
                     po.Y = item.Top;              
                     List_location.Add(po);
                
-                    Console.WriteLine(List_location.Count);
+                    //Console.WriteLine(List_location.Count);
                    
                 }
                 Position.Serialize(w, List_location);              
@@ -79,27 +76,30 @@ namespace WindowsFormsApp2
         {
 
             //clear panel
-
             userControl1.Controls.Clear();
-            using (FileStream fs = new FileStream("Json.json", FileMode.Open))
+            using (FileStream fs = new FileStream("SavePanel.json", FileMode.Open))
             using (StreamReader file = new StreamReader(fs))
             using (JsonReader w = new JsonTextReader(file))
             {
-                //Position po = new Position();
+               
                 JsonSerializer Position = new JsonSerializer();              
                 List<Position> positions = JsonConvert.DeserializeObject<List<Position>>(file.ReadToEnd());
-                Console.WriteLine(positions[0].X);
+     
                 //----------------------------------------------------------------------------------------
-                Console.WriteLine(List_location.Count);
+                //Console.WriteLine(List_location.Count);
                 for (int i=0; i<=positions.Count-1;i++)
                 {                
                     int Location_x = positions[i].X;
                     int Location_y = positions[i].Y;
-                    userControl1.AddNewBox(Location_x, Location_y,0);
+                    userControl1.AddNewBox(Location_x, Location_y,i);
 
                 }               
-                Console.WriteLine(List_location.Count);
+                //Console.WriteLine(List_location.Count);
             }
+          
+            userControl1.Read_Json();
+            userControl1.ReadSelectCount();
+         
         }
 
         private void textBox2_TextChanged(object sender, EventArgs e)

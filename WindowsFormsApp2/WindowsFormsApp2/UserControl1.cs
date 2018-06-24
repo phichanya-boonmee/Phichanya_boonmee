@@ -109,7 +109,7 @@ namespace WindowsFormsApp2
                     
                     _undoList.Add(hx);
                     _objHxList.Add(hx);
-                    Write_Json();
+                    //Write_Json();
 
                 }
                 RefreshHxBox();
@@ -136,7 +136,7 @@ namespace WindowsFormsApp2
                  
                     _undoList.Add(hx);
                     _objHxList.Add(hx);
-                    Write_Json();
+                    //Write_Json();
 
                 }
                 RefreshHxBox();
@@ -157,7 +157,7 @@ namespace WindowsFormsApp2
 
                     _undoList.Add(hx);
                     _objHxList.Add(hx);
-                    Write_Json();
+                    //Write_Json();
 
                 }
                 RefreshHxBox();
@@ -175,7 +175,7 @@ namespace WindowsFormsApp2
                 if(Control.ModifierKeys != Keys.Control)
                 {
                     _selectCount.Add(SelectedControls.Count);
-                    SelectCount();
+                    //SelectCount();
                 }                
             }
             //case2 don't press ctrl
@@ -185,7 +185,7 @@ namespace WindowsFormsApp2
                 {
                    
                     _selectCount.Add(SelectedControls.Count);
-                    SelectCount();
+                    //SelectCount();
                 }
                 //MessageBox.Show("No");              
                 item.BackColor = Color.Blue;
@@ -265,7 +265,7 @@ namespace WindowsFormsApp2
                         PanelObjectHistory hx = new PanelObjectHistory(thisPo.Left, thisPo.Top, thisPo);
                         PanelObjectHistory lastestHx = _undoList[_undoList.Count - 1];                
                         _redoList.Add(hx);                        
-                        lastestHx.targetPanel.Location = new Point(List_Undoocation[i].X, List_Undoocation[i].Y);                       
+                        lastestHx.targetPanel.Location = new Point(lastestHx.x, lastestHx.y);                       
                         _undoList.RemoveAt(_undoList.Count - 1);
                         //-----------------------------------------------------------------------------------
 
@@ -273,10 +273,10 @@ namespace WindowsFormsApp2
                     }
                     _selectCount_redo.Add(_selectCount[_selectCount.Count - 1]);
                     _selectCount.RemoveAt(_selectCount.Count - 1);
-                }                
-                RefreshHxBox();
+                }
+               
+                //RefreshHxBox();
 
-                //this.Focus();
 
             }
             //Redo
@@ -330,7 +330,7 @@ namespace WindowsFormsApp2
         public void Write_Json()
         {
             //Clear List after click button Save again
-            List_Undoocation.Clear();
+            List_UndoLocation.Clear();
             //_undoList.Clear();
             using (FileStream fs = new FileStream("Undo_Json.json", FileMode.Create))
             using (StreamWriter file = new StreamWriter(fs))
@@ -340,48 +340,54 @@ namespace WindowsFormsApp2
 
                 for (int i = 0; i <= _undoList.Count - 1; i++)
                 {
-                    //Control item = (Control)sender;
+                    
                     Position po = new Position();
                     po.X = _undoList[i].x;
                     po.Y = _undoList[i].y;
                     po.T = (int)_undoList[i].targetPanel.Tag;
-                    List_Undoocation.Add(po);
-                    
-                   
-
-                    Console.WriteLine(List_Undoocation.Count);
+                    List_UndoLocation.Add(po);
                     
                 }
-                Position.Serialize(w, List_Undoocation);
+                Position.Serialize(w, List_UndoLocation);
                 
                 
             }
           
         }
+        //read undo
         public void Read_Json()
         {
-            List_Undoocation.Clear();
-            using (FileStream fs = new FileStream("Json.json", FileMode.Open))
+            List_UndoLocation.Clear();
+            
+            using (FileStream fs = new FileStream("Undo_Json.json", FileMode.Open))
             using (StreamReader file = new StreamReader(fs))
             using (JsonReader w = new JsonTextReader(file))
             {
                 
                 JsonSerializer Position = new JsonSerializer();
                 List<Position> positions = JsonConvert.DeserializeObject<List<Position>>(file.ReadToEnd());
-                Console.WriteLine(positions[0].X);
+                //Console.WriteLine(positions[0].X);
                 //----------------------------------------------------------------------------------------
-                Console.WriteLine(List_Undoocation.Count);
                 for (int i = 0; i <= positions.Count - 1; i++)
                 {
+                    Position po = new Position();
                     int myTag = positions[i].T;
                     int Location_x = positions[i].X;
                     int Location_y = positions[i].Y;
-                    
-                    AddNewBox(Location_x, Location_y, myTag);
-                    
+    
+                    foreach (Control item in this.Controls)
+                    {
+                       
+                       PanelObjectHistory hx = new PanelObjectHistory(Location_x, Location_y, item);
+                       if(myTag == (int)item.Tag)
+                        {
+                            _undoList.Add(hx);
+                        }
+                                              
+                    }
 
                 }
-                Console.WriteLine(List_Undoocation.Count);
+
             }
         }
         public void SelectCount()
@@ -394,6 +400,24 @@ namespace WindowsFormsApp2
                 JsonSerializer Position = new JsonSerializer();
 
                 Position.Serialize(w, _selectCount);
+            }
+        }
+        public void ReadSelectCount()
+        {
+            _selectCount.Clear();
+            
+            using (FileStream fs = new FileStream("Tag_Json.json", FileMode.Open))
+            using (StreamReader file = new StreamReader(fs))
+            using (JsonReader w = new JsonTextReader(file))
+            {
+
+                //JsonSerializer Position = new JsonSerializer();
+                string json = file.ReadToEnd();
+                JArray array = JArray.Parse(json);
+                foreach(JValue item in array)
+                {     
+                    _selectCount.Add((int)item);
+                }
             }
         }
         private void UserControl1_KeyUp(object sender, KeyEventArgs e)
@@ -413,7 +437,7 @@ namespace WindowsFormsApp2
             public int Y;
             
         }
-        List<Position> List_Undoocation = new List<Position>();
+        List<Position> List_UndoLocation = new List<Position>();
         
         enum CommandKind
         {
